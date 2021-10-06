@@ -1,5 +1,5 @@
+from random import shuffle
 from PokerGameBase import ImageSprite
-
 
 class Card(object):
     # 1 is Clubs, 2 is diamonds, 3 is hearts, and 4 is spades
@@ -120,3 +120,18 @@ class CardImage(ImageSprite):
     def flipCard(self):
         self._fileName = "Images/" + str(self._suit).lower() + str(self._rank) + ".bmp"
         super().__init__(self._xCoord, self._yCoord, self._fileName)
+
+# Creates a deck that acts as a list object
+# Holds all 52 Card values that should be in a deck
+class Deck(list):
+    def __init__(self):
+        super().__init__()
+        suits = list(range(1, 5))
+        ranks = list(range(2, 15))
+        [[self.append(Card(i, j)) for j in suits] for i in ranks]
+
+    def shuffle(self):
+        shuffle(self)
+
+    def deal(self):
+        return self.pop(0)
