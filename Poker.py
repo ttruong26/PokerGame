@@ -1,16 +1,10 @@
 from PokerGameBase import GameBase
 import pygame
-from card import CardImage
-from deck import Deck
+from PokerElements import Card, CardImage, Deck
 
 
 GAME_WIDTH = 800
 GAME_HEIGHT = 600
-
-
-class Hand(list):
-    def __init__(self):
-        super().__init__()
 
 
 class PokerGame(GameBase):
@@ -134,18 +128,54 @@ class PokerGame(GameBase):
             self.add(card)
 
     def raiseBy(self):
-        self._round += 1
-        cont = True
-        amount = int(input("Enter the an amount to wager:"))
-        while cont:
-            if amount <= self._bank:
-                self._pot += 2 * amount
-                self._bank -= amount
-                self.addToRiver()
-                cont = False
+        rectangle = pygame.Rect(0, self._height - 100 - 50, 100, 40)
+        font = pygame.font.Font(None, 32)
+        color_inactive = pygame.Color('lightskyblue3')
+        color_active = pygame.Color('dodgerblue2')
+        color = color_inactive
+        text = ''
+
+        active = False
+        for event in pygame.event.get():
+            if rectangle.collidepoint(event.pos):
+                active = not active
             else:
-                print("Can not make a bet that is more than what you have.")
-                amount = int(input("Enter an amount to wager: "))
+                active = False
+            color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        if int(text) <= self._bank:
+                            self._pot += 2 * int(text)
+                            self._bank -= int(text)
+                            self._round += 1
+                            self.addToRiver()
+                        text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+        self._display.fill((30, 30, 30))
+        txt_surface = font.render(text, True, color)
+        width = max(200, txt_surface.get_width() + 10)
+        rectangle.w = width
+        self._display.blit(txt_surface, (rectangle.x + 5, rectangle.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(self._display, color, rectangle, 2)
+
+        pygame.display.flip()
+
+        # cont = True
+        # amount = int(input("Enter the an amount to wager:"))
+        # while cont:
+        #     if amount <= self._bank:
+        #         self._pot += 2 * amount
+        #         self._bank -= amount
+        #         self.addToRiver()
+        #         cont = False
+        #     else:
+        #         print("Can not make a bet that is more than what you have.")
+        #         amount = int(input("Enter an amount to wager: "))
 
     def check(self):
         self._round += 1
@@ -426,6 +456,7 @@ class PokerGame(GameBase):
         self.displayButton('Deposit', self._width - 100, self._height - 40, 100, 40, self.deposit)
         self.displayButton('Reset', self._width - 100, self._height - 90, 100, 40, self.reset)
 
+
     def update(self):
         super().update()
         if self.getTicks() == 10:
@@ -463,3 +494,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

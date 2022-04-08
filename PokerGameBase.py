@@ -1,6 +1,24 @@
 import pygame
 
 
+class Button:
+    def __init__(self, text, x, y, width, height, action=None):
+        self._text = text
+        self._x = x
+        self._y = y
+        self._width = width
+        self._height = height
+        self._action = action
+
+    def draw(self):
+        font = pygame.font.Font("FreeSansBold.ttf", 32)
+        text = font.render(self._text, True, (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (self._x + (self._width / 2), self._y - (self._height * .75))
+        rectangle = pygame.Rect(self._x, self._y - 50, self._width, self._height)
+
+        button_color = (0, 75, 0)
+        hover_button = (0, 250, 0)
 class GameBase:
     def __init__(self, width, height):
         pygame.init()
@@ -58,20 +76,22 @@ class GameBase:
         text = font.render(text, True, (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (x + (boxWidth / 2), y - (boxHeight * .75))
+        rectangle = pygame.Rect(x, y - 50, boxWidth, boxHeight)
 
         button_color = (0, 75, 0)
         hover_button = (0, 250, 0)
 
         mouse = pygame.mouse.get_pos()
-        # click = pygame.mouse.get_pressed()
+        click = pygame.mouse.get_pressed()
 
         #If the mouse is hovered over the box, then it changes colors
         if x <= mouse[0] <= x + boxWidth and y - boxHeight <= mouse[1] <= y:
-            pygame.draw.rect(self._display, hover_button, [x, y - 50, boxWidth, boxHeight])
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN and action != None:
-            #if click[0] == 1 and action != None:
-                    action()
+            pygame.draw.rect(self._display, hover_button, rectangle)
+            #for event in pygame.event.get():
+                #if event.type == pygame.MOUSEBUTTONDOWN and action != None:
+            if click[0] == 1 and action != None:
+                action()
+
         else:
             pygame.draw.rect(self._display, button_color, [x, y - 50, boxWidth, boxHeight])
 
